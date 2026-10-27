@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CafeBites | Producer–Consumer Lab</title>
+  <link rel="stylesheet" href="src/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div><div class="brand">☕ CafeBites</div><div class="subbrand">Campus café · Ordering + OS synchronization demo</div></div>
+    <div class="status"><span class="pulse"></span> Local simulation</div>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div>
+        <p class="eyebrow">OPERATING SYSTEMS VIRTUAL LAB</p>
+        <h1>Order at your table.<br><em>Watch the kitchen queue.</em></h1>
+        <p class="lead">A working single-browser prototype that models a café tablet as the producer and the kitchen as the consumer.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true"><span>🥪</span><span>☕</span><span>🍟</span><span>🧑‍🍳</span></div>
+    </section>
+
+    <div class="layout">
+      <section class="menu-panel panel">
+        <div class="section-heading"><div><p class="eyebrow">TABLET · PRODUCER</p><h2>What sounds good?</h2></div><div class="pill">Table <b>04</b></div></div>
+        <label class="search"><span>⌕</span><input id="search" placeholder="Search snacks, drinks..." /></label>
+        <div class="filters" id="filters">
+          <button class="filter active" data-category="All">All</button><button class="filter" data-category="Snacks">Snacks</button><button class="filter" data-category="Meals">Meals</button><button class="filter" data-category="Drinks">Drinks</button><button class="filter" data-category="Sweets">Sweets</button>
+        </div>
+        <div class="menu-grid" id="menu"></div>
+      </section>
+
+      <aside class="side-stack">
+        <section class="panel cart-panel">
+          <div class="section-heading"><div><p class="eyebrow">YOUR ORDER</p><h2>Cart <span class="count" id="cartCount">0</span></h2></div><button class="text-btn" id="clearCart">Clear</button></div>
+          <div id="cartItems" class="cart-items"><div class="empty-state">Your cart is waiting for its first snack.</div></div>
+          <div class="totals"><div><span>Subtotal</span><b id="subtotal">₹0</b></div><div><span>Estimated GST (5%)</span><b id="tax">₹0</b></div><div class="grand"><span>Total</span><b id="total">₹0</b></div></div>
+          <button class="primary full" id="placeOrder">＋ Send order to kitchen</button>
+          <p class="hint" id="placeHint">Orders enter a bounded queue with capacity 3.</p>
+        </section>
+        <section class="panel queue-panel">
+          <div class="section-heading"><div><p class="eyebrow">SHARED BUFFER</p><h2>Kitchen queue</h2></div><span class="pill" id="queueStatus">0 / 3 slots</span></div>
+          <div class="buffer-slots" id="bufferSlots"></div>
+          <div class="queue-actions"><button class="primary" id="processOrder">✓ Prepare next</button><button class="secondary" id="resetLab">Reset lab</button></div>
+          <p class="hint">The kitchen consumes the oldest queued order (FIFO).</p>
+        </section>
+      </aside>
+    </div>
+
+    <section class="lab-section">
+      <div class="lab-title"><div><p class="eyebrow">SYNCHRONIZATION LAB</p><h2>Producer–Consumer, made visible</h2></div><span class="pill">Bounded buffer · FIFO</span></div>
+      <div class="concept-grid">
+        <article class="concept"><div class="concept-icon purple">↗</div><h3>Producer</h3><p>The customer tablet creates an order and adds it to the shared queue.</p><code>produce(order)</code></article>
+        <article class="concept"><div class="concept-icon blue">🔒</div><h3>Mutex lock</h3><p>Only one operation may modify the queue at a time. This protects the critical section.</p><code>mutex.acquire()</code></article>
+        <article class="concept"><div class="concept-icon amber">▤</div><h3>Empty slots</h3><p>Before adding, the producer checks for available capacity. A full buffer blocks new orders.</p><code>empty &gt; 0</code></article>
+        <article class="concept"><div class="concept-icon green">✓</div><h3>Not-empty signal</h3><p>After adding an order, the producer signals that work is available for the kitchen.</p><code>full &gt; 0</code></article>
+      </div>
+      <div class="lab-columns">
+        <section class="panel event-panel">
+          <div class="section-heading"><div><p class="eyebrow">LIVE EVENT LOG</p><h3>What just happened?</h3></div><button class="text-btn" id="clearLog">Clear log</button></div>
+          <div class="log" id="eventLog" aria-live="polite"></div>
+        </section>
+        <section class="panel race-panel">
+          <div class="section-heading"><div><p class="eyebrow">COMPARE THE BEHAVIOUR</p><h3>Race condition demo</h3></div><span class="pill warning">Unsafe mode</span></div>
+          <p class="race-copy">Simulate two kitchen workers reading the same first order before either removes it. Without a mutex, both can “prepare” the same order.</p>
+          <div class="race-controls"><label>Workers <select id="workers"><option value="2">2 workers</option><option value="3">3 workers</option></select></label><button class="danger" id="raceDemo">Run unsafe race</button></div>
+          <div class="race-result" id="raceResult">Run the demo to compare unsafe access with the mutex-protected queue.</div>
+          <div class="safe-note"><span>🔐</span><div><b>Protected version</b><p>“Prepare next” uses a single atomic queue operation in this simulation, so one order is removed once.</p></div></div>
+        </section>
+      </div>
+      <div class="note"><b>Lab note:</b> This is a front-end simulation. It models semaphore rules and race-condition outcomes for learning; JavaScript UI actions run on one browser event loop, so this is not a real multithreaded OS process or a multi-device ordering backend.</div>
+    </section>
+  </main>
+  <footer>CAFEBITES · Producer–Consumer OS lab prototype <span>Made for learning, not live payments</span></footer>
+  <script src="src/app.js"></script>
+</body>
+</html>
